@@ -2,22 +2,30 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.event.*;
 import javax.swing.*;
+import javax.swing.border.*;
+import java.util.*;
+
 
 public class GUI extends JFrame implements ActionListener{
     
     
     GridBagConstraints con;
-    String [] colors = {"Blå","Röd","Gul","Green"};
+    DefaultListModel<String> names = new DefaultListModel<String>();
     
-
-    JList<String> list = new JList<>(colors);
+    
     JLabel menuLabel = new JLabel("Menu");
-    JLabel listLabel = new JLabel("Sortera");
+    JPanel mlPanel = new JPanel(new GridLayout(1,1));
+
+    JPanel listPanel = new JPanel();
+    JLabel listLabel = new JLabel("Sortera efter");
     JComboBox<String> combox = new JComboBox<>();
-	JPanel tools = new JPanel();
+
 	
-	JTextField searchText = new JTextField(20);
+	JPanel tools = new JPanel();
+	JTextField searchText = new JTextField(15);
 	JButton search = new JButton("Search");
+
+	Color backgrounds = new Color(182,200,222);
 	
 
     
@@ -29,52 +37,59 @@ public class GUI extends JFrame implements ActionListener{
 
 		JTabbedPane tab = new JTabbedPane();
 		JPanel addMember = new JPanel();
-		JScrollPane listHandler = new JScrollPane(main);
-		tab.addTab("List Handler",listHandler);
+		JScrollPane listHandler = new JScrollPane(main,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		tab.addTab("Listhandler",listHandler);
 		tab.addTab("Add member",addMember);
 
-		tools.setLayout(new BoxLayout(tools,BoxLayout.Y_AXIS));
-
-		setVisible(true);
-		setSize(new Dimension(800,600));
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setResizable(true);
-		
-        con = new GridBagConstraints(); // menulabel
-        con.ipadx = 50;
-        con.weighty = 0; con.weightx = 0;
-        con.gridy = 0; con.gridx = 0;
-        con.gridheight = 1; con.gridwidth = 1;
-        gbl.setConstraints(menuLabel,con);
         
 
         con = new GridBagConstraints(); // toolbar
         con.ipadx = 50;
-        con.gridy = 1; con.gridx = 0;
+        con.gridy = 0; con.gridx = 0;
         con.weighty = 1; con.weightx = 0;
         con.fill = GridBagConstraints.VERTICAL;
         con.gridheight = 10; con.gridwidth = 2;
         gbl.setConstraints(tools,con);
 
-        tools.add(Box.createRigidArea(new Dimension(1,10)));
+        tools.setLayout(new BoxLayout(tools,BoxLayout.Y_AXIS)); 
+        
+        menuLabel.setAlignmentX(CENTER_ALIGNMENT);
+        tools.add(menuLabel);
+        tools.add(Box.createRigidArea(new Dimension(1,20)));
+        searchText.setMinimumSize(searchText.getPreferredSize());
+        searchText.setMaximumSize(searchText.getPreferredSize());
         tools.add(searchText);
         tools.add(Box.createRigidArea(new Dimension(1,10)));
+        search.setAlignmentX(CENTER_ALIGNMENT);
         tools.add(search);
 
+        tools.setBorder(new LineBorder(Color.gray,1));
+        tools.setBackground(backgrounds);
 
-        con = new GridBagConstraints(); // sorteringslabel
+
+
+        con = new GridBagConstraints(); // sorteringspanel som sköter sorteringen av listan, alltså sortera efter : id eller namn
         con.gridy = 0; con.gridx = 2; 
-        con.gridheight = 1; con.gridwidth = 1;
-        gbl.setConstraints(listLabel, con);
-        
+        con.gridheight = 1; con.gridwidth = 8;
+        con.fill = GridBagConstraints.BOTH;
+        gbl.setConstraints(listPanel, con);
 
-        con = new GridBagConstraints();
-        con.gridy = 0; con.gridx = 3;
-        con.gridheight = 1; con.gridwidth = 1;
-        combox.addItem("Efter ID");
-        combox.addItem("Efter Namn");
-        gbl.setConstraints(combox,con);
-        
+        listPanel.setLayout(new BoxLayout(listPanel,BoxLayout.X_AXIS));
+        listPanel.add(listLabel);
+        listLabel.setAlignmentX(LEFT_ALIGNMENT);
+        listPanel.add(Box.createRigidArea(new Dimension(20,1)));
+        combox.addItem("ID");
+        combox.addItem("Namn");
+        combox.setAlignmentX(LEFT_ALIGNMENT);
+        combox.setMinimumSize(combox.getPreferredSize());
+        combox.setMaximumSize(new Dimension(200,200));
+        listPanel.add(combox);
+        listPanel.setBorder(new LineBorder(Color.gray,1));
+        listPanel.setBackground(backgrounds);
+
+        getNames(); // genererar en lista med namn .temporärt
+        JList<String> list = new JList<>(names);
+        JScrollPane listPane = new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
         con = new GridBagConstraints(); // listan
         con.anchor = GridBagConstraints.WEST;
@@ -82,18 +97,22 @@ public class GUI extends JFrame implements ActionListener{
         con.gridy = 1; con.gridx = 2;
         con.weighty = 1; con.weightx = 1;
         con.gridheight = 10; con.gridwidth = 6;
-        gbl.setConstraints(list,con);
+        gbl.setConstraints(listPane,con);
 
-        list.setVisibleRowCount(4);
+        list.setVisibleRowCount(25);
         
 
-        main.add(menuLabel);
-        main.add(listLabel);
-        main.add(combox);		
+        
+        main.add(listPanel);		
 		main.add(tools);
-		main.add(list);
+		main.add(listPane);
 
 		add(tab);
+
+		setVisible(true);
+		setSize(new Dimension(800,600));
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setResizable(true);
 
 		pack();
 		
@@ -104,5 +123,13 @@ public class GUI extends JFrame implements ActionListener{
 
 	public void actionPerformed(ActionEvent e){
 
+	}
+
+	protected void getNames(){
+           String [] someNames = {"Viktoria","Christoffer","Shankho","Dennis","Maria","William","Alexander"};
+           for(int i=0; i<100; i++){
+              names.addElement(someNames[new Random().nextInt(6)]);
+           }
+           
 	}
 }
