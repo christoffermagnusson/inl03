@@ -21,16 +21,23 @@ public class AddMemberGUI extends JPanel{
     JComboBox<Integer> day = new JComboBox<>();
     JComboBox<Integer> month = new JComboBox<>();
     JComboBox<Integer> year = new JComboBox<>();
-    JLabel memberSince = new JLabel(); // sätt in dateformat med dagens datum
+    JLabel memberSince = new JLabel(); // sätt in dateformat med dagens datum // redundant?
     
+    JLabel genderLabel = new JLabel("Gender");
     ButtonGroup gender = new ButtonGroup(); // lägg till underliggande knappar
     JRadioButton male = new JRadioButton("Male");
     JRadioButton female = new JRadioButton("Female");
 
-    ButtonGroup role = new ButtonGroup();
+    JLabel roleLabel = new JLabel("Role");
     JCheckBox player = new JCheckBox("Player");
     JCheckBox coach = new JCheckBox("Coach");
     JCheckBox parent = new JCheckBox("Parent");
+
+    JLabel teamLabel = new JLabel(String.format("%20s","Team"));
+    JComboBox<String> teams = new JComboBox<>(); // input available teams from db
+
+    JButton add = new JButton("Add new member");
+    JButton clear = new JButton("Clear fields");
 
 
 	
@@ -44,7 +51,7 @@ public class AddMemberGUI extends JPanel{
         rightPanel.setBackground(background);
         
         JPanel middlePanel = new JPanel(); // setting middlepanel as default workspace
-        middlePanel.setBorder(new LineBorder(Color.black,3));
+        //middlePanel.setBorder(new LineBorder(Color.black,3));
         middlePanel.setLayout(new BoxLayout(middlePanel,BoxLayout.Y_AXIS));
         middlePanel.setBackground(background);
         add(leftPanel); add(middlePanel); add(rightPanel);
@@ -83,7 +90,7 @@ public class AddMemberGUI extends JPanel{
         middlePanel.add(Box.createRigidArea(new Dimension(1,20)));
         
         
-        JPanel birth = new JPanel();
+        JPanel birth = new JPanel(); // Panel containing labels and comboboxes to be used to specify birthdate
         setupBirth(day,1,31);
         setupBirth(month,1,12);
         setupBirth(year,1900,2016);
@@ -119,7 +126,58 @@ public class AddMemberGUI extends JPanel{
 
         birth.add(dayPanel); birth.add(monthPanel); birth.add(yearPanel);
         
-        middlePanel.add(birth);
+        middlePanel.add(birth); // end birth-Panel
+        middlePanel.add(Box.createRigidArea(new Dimension(1,20)));
+
+
+        JPanel genderPanel = new JPanel(); // Panel holding option for choosing gender
+        genderPanel.setLayout(new BoxLayout(genderPanel,BoxLayout.X_AXIS));
+        genderPanel.setBackground(background);
+        gender.add(male); gender.add(female);
+        male.setBackground(background); female.setBackground(background);
+        genderPanel.add(genderLabel);
+        genderPanel.add(Box.createRigidArea(new Dimension(15,1)));
+        genderPanel.add(male); genderPanel.add(female);
+        middlePanel.add(genderPanel);
+
+        middlePanel.add(Box.createRigidArea(new Dimension(1,20)));
+
+
+        JPanel rolePanel = new JPanel(); // Panel holding options regarding roles
+        rolePanel.setLayout(new BoxLayout(rolePanel,BoxLayout.X_AXIS));
+        rolePanel.setBackground(background);
+        rolePanel.setAlignmentX(CENTER_ALIGNMENT);
+        player.setBackground(background); coach.setBackground(background); parent.setBackground(background);
+        rolePanel.add(Box.createRigidArea(new Dimension(75,1)));
+        rolePanel.add(roleLabel);
+        rolePanel.add(Box.createRigidArea(new Dimension(15,1)));
+        rolePanel.add(player); rolePanel.add(coach); rolePanel.add(parent);
+        middlePanel.add(rolePanel);
+
+        middlePanel.add(Box.createRigidArea(new Dimension(1,20)));
+
+
+        JPanel teamPanel = new JPanel();
+        teamPanel.setLayout(new BoxLayout(teamPanel,BoxLayout.X_AXIS));
+        teamPanel.setBackground(background);
+        teamPanel.add(teamLabel); teamPanel.add(Box.createRigidArea(new Dimension(20,1)));
+        teamPanel.add(teams); 
+        teams.setMaximumSize(teams.getPreferredSize());
+        teamPanel.setAlignmentX(RIGHT_ALIGNMENT);
+        middlePanel.add(teamPanel);
+
+        middlePanel.add(Box.createRigidArea(new Dimension(1,20)));
+
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.X_AXIS));
+        buttonPanel.setBackground(background);
+        buttonPanel.add(Box.createRigidArea(new Dimension(65,1)));
+        buttonPanel.add(add); 
+        buttonPanel.add(Box.createRigidArea(new Dimension(10,1)));
+        buttonPanel.add(clear);
+        middlePanel.add(buttonPanel);
+
 
         
 
