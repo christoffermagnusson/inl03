@@ -7,9 +7,14 @@ import java.util.*;
 
 public class ListGUI extends JPanel{
 
-	 GridBagConstraints con;
-    DefaultListModel<String> names = new DefaultListModel<String>();
+    FormatList fl = new FormatList();
+	  GridBagConstraints con;
+    String [] col = {"Id","Given name","Family name","Email","Gender","Birthday","Member since"
+    ,"Active"};
+    JTable memberTable = new JTable(fl.getData(fl.initList(fl.getStatement())),col);
     
+    JScrollPane listPane = new JScrollPane(memberTable,
+      JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     
     JLabel menuLabel = new JLabel("Menu");
     JPanel mlPanel = new JPanel(new GridLayout(1,1));
@@ -17,6 +22,7 @@ public class ListGUI extends JPanel{
     JPanel listPanel = new JPanel();
     JLabel listLabel = new JLabel("Sort by");
     JComboBox<String> combox = new JComboBox<>();
+    JButton sortButton = new JButton("Sort");
 
 	
 	JPanel tools = new JPanel();
@@ -72,12 +78,15 @@ public class ListGUI extends JPanel{
         combox.setMinimumSize(combox.getPreferredSize());
         combox.setMaximumSize(new Dimension(200,200));
         listPanel.add(combox);
+        //listPanel.add(Box.createRigidArea(new Dimension(20,1)));
+        listPanel.add(sortButton);
         listPanel.setBorder(new LineBorder(Color.gray,1));
         listPanel.setBackground(backgrounds);
 
-        getNames(); // genererar en lista med namn .temporärt
-        JList<String> list = new JList<>(names); // När query-klassen är skapad så skall listan över medlemmar in här by default, sedan modifiera listan i lyssnarklassen efter specifikation
-        JScrollPane listPane = new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+        
+        
+        
 
         con = new GridBagConstraints(); // listan
         con.anchor = GridBagConstraints.WEST;
@@ -87,7 +96,7 @@ public class ListGUI extends JPanel{
         con.gridheight = 10; con.gridwidth = 6;
         gbl.setConstraints(listPane,con);
 
-        list.setVisibleRowCount(25);
+        
         
 
         
@@ -95,11 +104,6 @@ public class ListGUI extends JPanel{
 		add(tools);
 		add(listPane);
 	}
-	protected void getNames(){
-           String [] someNames = {"Viktoria","Christoffer","Shankho","Dennis","Maria","William","Alexander"};
-           for(int i=0; i<100; i++){
-              names.addElement(someNames[new Random().nextInt(6)]);
-           }
-           
-	}
+
+	
 }
