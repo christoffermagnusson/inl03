@@ -4,7 +4,9 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
 
-public class AddMemberGUI extends JPanel{
+public class AddMemberView extends JPanel{
+
+    AddMemberModel model = new AddMemberModel();
 
     Color background = new Color(182,200,222);
     
@@ -41,7 +43,7 @@ public class AddMemberGUI extends JPanel{
 
 
 	
-	public AddMemberGUI(){
+	public AddMemberView(){
         
         setLayout(new GridLayout(1,3));
 

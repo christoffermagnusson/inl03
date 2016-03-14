@@ -7,23 +7,16 @@ import java.util.*;
 
 
 public class GUI extends JFrame{ // Main window
-    
-    
-    
-    
-    JPanel addMember = new AddMemberGUI();
-    JPanel list = new ListGUI();  
+    JPanel addMember = new AddMemberView();
+    JPanel list = new ListGUIView();  
 	
-
-    
 	public GUI(){
 		
-
 		JTabbedPane tab = new JTabbedPane();
-		JScrollPane listHandler = new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane listHandler = new JScrollPane(list,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		tab.addTab("Listhandler",listHandler);
 		tab.addTab("Add member",addMember);
- 
 
 		add(tab);
 
@@ -31,15 +24,10 @@ public class GUI extends JFrame{ // Main window
 		setSize(new Dimension(1080,860));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(true);
-
 		
 		
-
 		
-
 	}
-
 	
-
 	
 }

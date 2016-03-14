@@ -2,20 +2,36 @@ import java.sql.*;
 import java.util.*;
 import javax.swing.*;
 
-public class FormatList{
+public class ListGUIModel{
 
-  DBConnection db = new DBConnection();
+  Connection c = null;
   Statement st = null;
   ResultSet res = null;
   
   
 
-  public FormatList(){
-    openStatement(db.createConnection());
+  public ListGUIModel(){
+    createConnection();
+    openStatement();
 
   }
 
-  public void openStatement(Connection c){
+  public void createConnection(){
+    try{
+      Class.forName("org.sqlite.JDBC");
+    }
+    catch(ClassNotFoundException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+    try{
+      c = DriverManager.getConnection("jdbc:sqlite:init");
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+  }
+
+  public void openStatement(){
     try{
       st = c.createStatement();
     }
@@ -23,19 +39,15 @@ public class FormatList{
       JOptionPane.showMessageDialog(null,e.getMessage());
     }
   }
-  public Statement getStatement(){
-    return st;
-  }
+ 
 
 
-  /**
-  *End of creation of statement to use in listeners
-  */
 
-  public ResultSet initList(Statement s){
-    String getList = String.format("SELECT * FROM medlem");
+
+  public ResultSet initList(String q){
+    
     try{
-      res = s.executeQuery(getList);
+      res = st.executeQuery(q);
     }
     catch(SQLException e){
       JOptionPane.showMessageDialog(null,"SQL fel!!! " + e.getMessage());
@@ -106,11 +118,21 @@ public class FormatList{
 
     return data;
   }
+
+  public boolean isNumeric(String s){
+    try{
+      int tmp = Integer.parseInt(s);
+      return true;
+    }
+    catch(NumberFormatException e){
+      return false;
+    }
+  }
   
   
   
 
-  /*public void formatElements(){
+  /*public void formatElements(){ // Testa denna med att räkna tmp++ i loopen istället
     int tmp = 0;
 
     for(int i=0; i<ml.size(); i++){
