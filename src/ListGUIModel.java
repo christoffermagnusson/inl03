@@ -138,14 +138,14 @@ public class ListGUIModel{
     for(int i=0; i<ml.size(); i++){
        char[] c = ml.get(i).getGivenName().toCharArray();
        for(int j=c.length; j<20; j++){
-       tmp=j;
+       tmp++;
        }
         String f = "%-"+tmp+"s";
         ml.get(i).setGivenName(String.format(f,ml.get(i).getGivenName()));
 
         c = ml.get(i).getFamilyName().toCharArray();
         for(int k=c.length; k<30; k++){
-          tmp=k;
+          tmp++;
         }
         f = "%-"+tmp+"s";
         ml.get(i).setFamilyName(String.format(f,ml.get(i).getFamilyName()));   

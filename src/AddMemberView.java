@@ -3,10 +3,12 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.border.*;
+import java.util.*;
 
 public class AddMemberView extends JPanel{
 
     AddMemberModel model = new AddMemberModel();
+    String tmpGender = "";
 
     Color background = new Color(182,200,222);
     
@@ -20,9 +22,9 @@ public class AddMemberView extends JPanel{
     JTextField email = new JTextField(15);
     
     JLabel birthLabel = new JLabel(String.format("%14s","Birthdate")); // use format to adjust distance and align label components
-    JComboBox<Integer> day = new JComboBox<>();
-    JComboBox<Integer> month = new JComboBox<>();
-    JComboBox<Integer> year = new JComboBox<>();
+    JComboBox<String> day = new JComboBox<>();
+    JComboBox<String> month = new JComboBox<>();
+    JComboBox<String> year = new JComboBox<>();
     JLabel memberSince = new JLabel(); // sätt in dateformat med dagens datum // redundant?
     
     JLabel genderLabel = new JLabel("Gender");
@@ -38,7 +40,7 @@ public class AddMemberView extends JPanel{
     JLabel teamLabel = new JLabel(String.format("%20s","Team"));
     JComboBox<String> teams = new JComboBox<>(); // input available teams from db
 
-    JButton add = new JButton("Add new member");
+    JButton addButton = new JButton("Add new member");
     JButton clear = new JButton("Clear fields");
 
 
@@ -52,8 +54,7 @@ public class AddMemberView extends JPanel{
         JPanel rightPanel = new JPanel();
         rightPanel.setBackground(background);
         
-        JPanel middlePanel = new JPanel(); // setting middlepanel as default workspace
-        //middlePanel.setBorder(new LineBorder(Color.black,3));
+        JPanel middlePanel = new JPanel(); // setting middlepanel as default workspace  
         middlePanel.setLayout(new BoxLayout(middlePanel,BoxLayout.Y_AXIS));
         middlePanel.setBackground(background);
         add(leftPanel); add(middlePanel); add(rightPanel);
@@ -66,6 +67,7 @@ public class AddMemberView extends JPanel{
         gnPanel.setBackground(background);
         gnPanel.add(givenNameLabel); gnPanel.add(Box.createRigidArea(new Dimension(20,1)));
         givenName.setMaximumSize(givenName.getPreferredSize());
+        givenName.addActionListener(a);
         gnPanel.add(givenName);
         middlePanel.add(gnPanel);
 
@@ -76,6 +78,7 @@ public class AddMemberView extends JPanel{
         fnPanel.setBackground(background);
         fnPanel.add(familyNameLabel); fnPanel.add(Box.createRigidArea(new Dimension(20,1)));
         familyName.setMaximumSize(familyName.getPreferredSize());
+        familyName.addActionListener(a);
         fnPanel.add(familyName);
         middlePanel.add(fnPanel);
 
@@ -86,6 +89,7 @@ public class AddMemberView extends JPanel{
         mailPanel.setBackground(background);
         mailPanel.add(emailLabel); mailPanel.add(Box.createRigidArea(new Dimension(20,1)));
         email.setMaximumSize(email.getPreferredSize());
+        email.addActionListener(a);
         mailPanel.add(email);
         middlePanel.add(mailPanel);
 
@@ -122,6 +126,9 @@ public class AddMemberView extends JPanel{
         day.setMaximumSize(day.getPreferredSize());
         month.setMaximumSize(month.getPreferredSize());
         year.setMaximumSize(year.getPreferredSize());
+        day.addActionListener(a);
+        month.addActionListener(a);
+        year.addActionListener(a);
         dayPanel.add(l1); dayPanel.add(day);
         monthPanel.add(l2); monthPanel.add(month);
         yearPanel.add(l3); yearPanel.add(year);
@@ -139,6 +146,7 @@ public class AddMemberView extends JPanel{
         male.setBackground(background); female.setBackground(background);
         genderPanel.add(genderLabel);
         genderPanel.add(Box.createRigidArea(new Dimension(15,1)));
+        male.addActionListener(a); female.addActionListener(a);
         genderPanel.add(male); genderPanel.add(female);
         middlePanel.add(genderPanel);
 
@@ -153,6 +161,7 @@ public class AddMemberView extends JPanel{
         rolePanel.add(Box.createRigidArea(new Dimension(75,1)));
         rolePanel.add(roleLabel);
         rolePanel.add(Box.createRigidArea(new Dimension(15,1)));
+        player.addActionListener(a); coach.addActionListener(a); parent.addActionListener(a);
         rolePanel.add(player); rolePanel.add(coach); rolePanel.add(parent);
         middlePanel.add(rolePanel);
 
@@ -163,7 +172,8 @@ public class AddMemberView extends JPanel{
         teamPanel.setLayout(new BoxLayout(teamPanel,BoxLayout.X_AXIS));
         teamPanel.setBackground(background);
         teamPanel.add(teamLabel); teamPanel.add(Box.createRigidArea(new Dimension(20,1)));
-        teamPanel.add(teams); 
+        teamPanel.add(teams);
+        setupTeams(teams,model.initTeams()); 
         teams.setMaximumSize(teams.getPreferredSize());
         teamPanel.setAlignmentX(RIGHT_ALIGNMENT);
         middlePanel.add(teamPanel);
@@ -175,7 +185,8 @@ public class AddMemberView extends JPanel{
         buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.X_AXIS));
         buttonPanel.setBackground(background);
         buttonPanel.add(Box.createRigidArea(new Dimension(65,1)));
-        buttonPanel.add(add); 
+        addButton.addActionListener(a);
+        buttonPanel.add(addButton); 
         buttonPanel.add(Box.createRigidArea(new Dimension(10,1)));
         buttonPanel.add(clear);
         middlePanel.add(buttonPanel);
@@ -195,11 +206,64 @@ public class AddMemberView extends JPanel{
 	*@param start Specified start of number range
 	*@param end Specified end of number range
 	*/
-	private void setupBirth(JComboBox<Integer> comp, int start, int end){
+	private void setupBirth(JComboBox<String> comp, int start, int end){
+           String tmp = "";
            for(int i=start; i<=end; i++){
-        	comp.addItem(i);
+            if(i<10){
+            tmp = 0 +""+i;
+            comp.addItem(tmp);
+            }
+            else{
+                tmp=""+i;
+                comp.addItem(tmp);
+            }
+
+        	
         }
 	}
+    private void setupTeams(JComboBox<String> comp,ArrayList<String> array){
+           for(int i=0; i<array.size(); i++){
+            comp.addItem(array.get(i));
+           }
+    }
+    private void setupRoles(int id){
+                  for(int i=0; i<3; i++){
+                if(player.isSelected() && i==0){
+                    model.setRoles(id,0,teams.getSelectedItem().toString());
+                }
+                if(coach.isSelected() && i==1){
+                    model.setRoles(id,1,teams.getSelectedItem().toString());
+                }
+                if(parent.isSelected() && i==2){
+                    model.setRoles(id,2,teams.getSelectedItem().toString());
+                }
+            }
+    }
+
+
+    ActionListener a = new ActionListener(){
+        public void actionPerformed(ActionEvent e){
+            if(e.getSource()==male){
+                tmpGender="Man";
+            }
+            else if(e.getSource()==female){
+                tmpGender="Kvinna";
+            }
+            else if(e.getSource()==addButton){
+                int id = model.setId();
+
+                model.insertNewMember(id,givenName.getText(),familyName.getText(),
+                    email.getText(),tmpGender,
+                    model.convertBirthday(day,month,year),model.getDates(),1
+                    );
+
+                    setupRoles(id);
+
+            }
+
+ 
+        }
+    };
 
 
 
