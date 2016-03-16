@@ -13,13 +13,7 @@ ResultSet res = null;
 
 
 private int id;
-/*private String givenName;
-private String familyName;
-private String email;
-private int gender;
-private String birth;
-private String memberSince;
-private int active;*/
+
 
 
 

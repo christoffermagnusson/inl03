@@ -8,7 +8,9 @@ import java.util.*;
 
 public class GUI extends JFrame{ // Main window
     JPanel addMember = new AddMemberView();
-    JPanel list = new ListGUIView();  
+    ListModel listModel = new ListModel();
+    JPanel list = new ListView(listModel); 
+    JPanel updateMember = new UpdateView(); 
 	
 	public GUI(){
 		
@@ -17,6 +19,7 @@ public class GUI extends JFrame{ // Main window
       JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		tab.addTab("Listhandler",listHandler);
 		tab.addTab("Add member",addMember);
+		tab.addTab("Update member",updateMember);
 
 		add(tab);
 

@@ -1,16 +1,35 @@
 import java.sql.*;
 import java.util.*;
 import javax.swing.*;
+import java.beans.*;
+import java.sql.Statement;
 
-public class ListGUIModel{
+public class ListModel implements Model{
 
   Connection c = null;
   Statement st = null;
   ResultSet res = null;
   
+   String [] col = {"Id","Given name","Family name","Email","Gender","Birthday","Member since"
+    ,"Active"};
+
+  private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+
+  public void addPropertyChangeListener(PropertyChangeListener l){
+    pcs.addPropertyChangeListener(l);
+  }
+  public void addPropertyChangeListener(String propName,PropertyChangeListener l){
+    pcs.addPropertyChangeListener(propName,l);
+  }
+  public void removePropertyChangeListener(PropertyChangeListener l){
+    pcs.removePropertyChangeListener(l);
+  }
+  public void removePropertyChangeListener(String propName,PropertyChangeListener l){
+    pcs.removePropertyChangeListener(propName,l);
+  }
   
 
-  public ListGUIModel(){
+  public ListModel(){
     createConnection();
     openStatement();
 
@@ -54,6 +73,10 @@ public class ListGUIModel{
     }
     return res;
   }
+
+  public String[] getColumnNames(){
+    return col;
+  }
     
     
     
@@ -82,7 +105,7 @@ public class ListGUIModel{
   *@return returns an Object[][] array with all elements to be added to the table.
   *        Object[1] being rows and Object[2] being columns.
   */
-  public Object[][] getData(ResultSet res){
+  public Object[][] getMemberData(ResultSet res){
     Object[][] data = new Object[200][getColumns(res)];
      
     int index = 0;
@@ -116,6 +139,33 @@ public class ListGUIModel{
   catch(SQLException e){
   }
 
+    return data;
+  }
+  public Object[][] getTeamData(ResultSet res){
+    Object[][] data = new Object[200][getColumns(res)];
+
+    int index = 0;
+    try{
+      while(res.next()){
+        int id = res.getInt(1);
+        String givenName = res.getString(2);
+        String familyName = res.getString(3);
+        int role = res.getInt(4);
+        String team = res.getString(5);
+
+        data[index][0]=id;
+        data[index][1]=givenName;
+        data[index][2]=familyName;
+        data[index][3]=role;
+        data[index][4]=team;
+
+        index++;
+      }
+      res.close();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
     return data;
   }
 

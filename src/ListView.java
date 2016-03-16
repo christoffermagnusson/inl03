@@ -5,17 +5,21 @@ import javax.swing.event.*;
 import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
+import java.beans.*;
 
-public class ListGUIView extends JPanel{
+public class ListView extends View{
 
-    ListGUIModel model = new ListGUIModel();
+    ListModel model;
+    
+    ArrayList<Component> compList = new ArrayList<Component>();
+
     
 
 	  GridBagConstraints con;
-    String [] col = {"Id","Given name","Family name","Email","Gender","Birthday","Member since"
+    String [] memberColumns = {"Id","Given name","Family name","Email","Gender","Birthday","Member since"
     ,"Active"};
-    DefaultTableModel tableModel = new DefaultTableModel(model.getData(model.initList(
-        "SELECT * FROM medlem")),col);
+    String [] teamColumns = {"Id","Given name","Family name","Role","Team"};
+    DefaultTableModel tableModel;
     JTable memberTable;
     JScrollPane listPane;
     
@@ -28,15 +32,22 @@ public class ListGUIView extends JPanel{
     JLabel listLabel = new JLabel("Sort by");
     JComboBox<String> combox = new JComboBox<>();
     JButton sortButton = new JButton("Sort");
+    JLabel switchLabel = new JLabel("Change view");
+    JComboBox<String> switchTable = new JComboBox<>();
+    JButton switchButton = new JButton("Change");
 
 	
 	JPanel tools = new JPanel();
 	JTextField searchText = new JTextField(15);
 	JButton search = new JButton("Search");
+     
 
 	Color backgrounds = new Color(182,200,222);
 
-	public ListGUIView(){
+	public ListView(ListModel m){
+        model = m;
+        setModel(m);
+
 		GridBagLayout gbl = new GridBagLayout();
 		setLayout(gbl);
 		GridBagConstraints con;
@@ -65,6 +76,7 @@ public class ListGUIView extends JPanel{
         
         tools.add(search);
 
+
         tools.setBorder(new LineBorder(Color.gray,1));
         tools.setBackground(backgrounds);
 
@@ -88,12 +100,23 @@ public class ListGUIView extends JPanel{
         listPanel.add(combox);
         sortButton.addActionListener(a);
         listPanel.add(sortButton);
+        listPanel.add(Box.createRigidArea(new Dimension(20,1)));
+        listPanel.add(switchLabel);
+        listPanel.add(Box.createRigidArea(new Dimension(20,1)));
+        switchTable.addItem("View members");
+        switchTable.addItem("View teams");
+        switchTable.setMaximumSize(switchTable.getPreferredSize());
+        listPanel.add(switchTable);
+        switchButton.addActionListener(a);
+        listPanel.add(switchButton);
+
         listPanel.setBorder(new LineBorder(Color.gray,1));
         listPanel.setBackground(backgrounds);
 
         
         
-        
+        tableModel = new DefaultTableModel(model.getMemberData(model.initList(
+        "SELECT * FROM medlem")),memberColumns);
         memberTable = new JTable(tableModel);
         listPane = new JScrollPane(memberTable,
       JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -117,27 +140,44 @@ public class ListGUIView extends JPanel{
 		add(listPane);
 	}
  
-  public void updateTable(String query){
-    memberTable.setModel(new DefaultTableModel(model.getData(model.initList
+  public void updateTable(String query,String [] col){
+    if(col==memberColumns){
+    memberTable.setModel(new DefaultTableModel(model.getMemberData(model.initList
         (query)),col));
+}
+else if(col==teamColumns){
+    memberTable.setModel(new DefaultTableModel(model.getTeamData(model.initList(query)),col));
+}
   }
+ 
+
+
 
   ActionListener a = new ActionListener(){
     public void actionPerformed(ActionEvent e){
         if(e.getSource()==search){
             if(model.isNumeric(searchText.getText())==false){
-            updateTable("SELECT * FROM medlem WHERE givenName = '"+searchText.getText()+"'");
+            updateTable("SELECT * FROM medlem WHERE givenName = '"+searchText.getText()+"'",memberColumns);
         }
         else{
-            updateTable("SELECT * FROM medlem WHERE id = "+searchText.getText());
+            updateTable("SELECT * FROM medlem WHERE id = "+searchText.getText(),memberColumns);
         }
     }
     else if(e.getSource()==sortButton){
         if(combox.getSelectedItem().toString()=="ID"){
-            updateTable("SELECT * FROM medlem ORDER BY id");
+            updateTable("SELECT * FROM medlem ORDER BY id",memberColumns);
         }
         else if(combox.getSelectedItem().toString()=="Family name"){
-            updateTable("SELECT * FROM medlem ORDER BY familyName");
+            updateTable("SELECT * FROM medlem ORDER BY familyName",memberColumns);
+        }
+    }
+    else if(e.getSource()==switchButton){
+        if(switchTable.getSelectedItem().toString()=="View teams"){
+    updateTable("SELECT DISTINCT medlem.id,givenName,familyName,role,team FROM medlem,funktion ON medlem.id=funktion.id WHERE team IS NOT NULL"
+        ,teamColumns);
+        }
+        else if(switchTable.getSelectedItem().toString()=="View members"){
+            updateTable("SELECT * FROM medlem",memberColumns);
         }
     }
     }

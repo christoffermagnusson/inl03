@@ -1,1 +1,0 @@
-create table person (id integer not null,name varchar(10),primary key (id)); insert into person values (1,'Christoffer'); insert into person values(2,'Viktoria'); 
