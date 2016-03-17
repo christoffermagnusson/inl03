@@ -60,7 +60,7 @@ public class UpdateModel{
       res.close();
     }
     catch(SQLException e){
-      JOptionPane.showMessageDialog(null,e.getMessage());
+      JOptionPane.showMessageDialog(null,"Member does not exist");
     }
     
     return list;
@@ -73,11 +73,24 @@ public class UpdateModel{
       res.close();
     }
     catch(SQLException e){
-      JOptionPane.showMessageDialog(null,e.getMessage());
+      JOptionPane.showMessageDialog(null,"Member does not exist");
     }
 
     return email;
   }
+
+   public void updateEmail(String id,String email){
+    try{
+      PreparedStatement prepEmail = c.prepareStatement("UPDATE medlem SET email=? WHERE id=?");
+      prepEmail.setString(1,email);
+      prepEmail.setString(2,id);
+      prepEmail.executeUpdate();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,"Member does not exist");
+    }
+  }
+
   public void setId(String id){
     this.id=id;
   }
@@ -95,46 +108,29 @@ public class UpdateModel{
       res.close();
     }
     catch(SQLException e){
-      JOptionPane.showMessageDialog(null,e.getMessage());
+      JOptionPane.showMessageDialog(null,"Member does not exist");
     }
     return array;
   }
-  /*public void updateRoles(ArrayList<Integer> array,String id){
-    int player = array.get(0);
-    int coach = array.get(1);
-    int parent = array.get(2);
-          try{
-      if(player==0 || coach==1 || parent==2){           
-           PreparedStatement prepRole = c.prepareStatement("INSERT INTO funktion VALUES(?,?,?)");
-           prepRole.setString(1,id);
-        prepRole.setString(2,role);
-        prepRole.setString(3,"");
-        prepRole.executeUpdate();
-    }
-    else{
-      PreparedStatement deleteRole = c.prepareStatement("DELETE * FROM funktion WHERE id=? AND role=?");
-    }
 
-    catch(SQLException e){
-      JOptionPane.showMessageDialog(null,e.getMessage());
-    }
-  }
-  }*/
 
-  public void updateRole(int role,String id){
+  public void createRole(int role,String id){
     try{
       res = s.executeQuery("SELECT * FROM funktion WHERE id="+id+" AND role="+role);
       if(!res.next()){
+        res = s.executeQuery("SELECT * FROM medlem WHERE id="+id);
+        if(res.next()){
         PreparedStatement prepRole = c.prepareStatement("INSERT INTO funktion VALUES(?,?,?)");
         prepRole.setString(1,id);
         prepRole.setInt(2,role);
         prepRole.setString(3,null);
         prepRole.executeUpdate();
       }
+    }
       res.close();
     }
     catch(SQLException e){
-      JOptionPane.showMessageDialog(null,e.getMessage());
+      JOptionPane.showMessageDialog(null,"Member does not exist");
     }
   }
   public void deleteRole(int role,String id){
@@ -145,21 +141,31 @@ public class UpdateModel{
       delete.executeUpdate();
     }
     catch(SQLException e){
-      JOptionPane.showMessageDialog(null,e.getMessage());
+      JOptionPane.showMessageDialog(null,"Member does not exist");
     }
   }
- 
-  public void updateEmail(String id,String email){
+  public void deleteMember(String id){
     try{
-      PreparedStatement prepEmail = c.prepareStatement("UPDATE medlem SET email=? WHERE id=?");
-      prepEmail.setString(1,email);
-      prepEmail.setString(2,id);
-      prepEmail.executeUpdate();
+      PreparedStatement deleteFromMedlem = c.prepareStatement("DELETE FROM medlem WHERE id=?");
+      deleteFromMedlem.setString(1,id);
+      deleteFromMedlem.executeUpdate();
+      PreparedStatement deleteFromFunktion = c.prepareStatement("DELETE FROM funktion WHERE id=?");
+      deleteFromFunktion.setString(1,id);
+      deleteFromFunktion.executeUpdate();
+      PreparedStatement deleteFromChildren = c.prepareStatement("DELETE FROM children WHERE cid=?");
+      deleteFromChildren.setString(1,id);
+      deleteFromChildren.executeUpdate();
+      PreparedStatement deleteFromParent = c.prepareStatement("DELETE FROM children WHERE pid=?");
+      deleteFromParent.setString(1,id);
+      deleteFromParent.executeUpdate();
+
     }
     catch(SQLException e){
       JOptionPane.showMessageDialog(null,e.getMessage());
     }
   }
+ 
+ 
 
 
 

@@ -12,6 +12,7 @@ JPanel displayPanel = new JPanel();
 
 Color custom = new Color(182,200,222);
 UpdateModel model = new UpdateModel();
+Verifier ver = new Verifier();
 
 
 //searchPanel
@@ -31,7 +32,14 @@ JCheckBox player = new JCheckBox("Player");
 JCheckBox coach = new JCheckBox("Coach");
 JCheckBox parent = new JCheckBox("Parent");
 
+//statusPanel
+ButtonGroup status = new ButtonGroup();
+JLabel statusLabel = new JLabel("Status");
+JRadioButton active = new JRadioButton("Activate");
+JRadioButton inactive = new JRadioButton("Deactivate");
+
 JButton updateMember = new JButton("Update");
+JButton deleteMember = new JButton("Delete member");
 
 public UpdateView(){
 
@@ -47,12 +55,12 @@ public UpdateView(){
   searchPanel.add(Box.createRigidArea(new Dimension(1,50)));
   searchText.setMaximumSize(searchText.getPreferredSize());
   searchText.setAlignmentX(CENTER_ALIGNMENT);
-  searchText.addActionListener(a);
+  searchText.addActionListener(searchListener);
   searchPanel.add(searchText);
   searchPanel.add(Box.createRigidArea(new Dimension(1,20)));
   searchButton.setMaximumSize(searchButton.getPreferredSize());
   searchButton.setAlignmentX(CENTER_ALIGNMENT);
-  searchButton.addActionListener(a);
+  searchButton.addActionListener(searchListener);
   searchPanel.add(searchButton);
 
   list = new JList<String>(model.initList("SELECT * FROM medlem"));
@@ -63,7 +71,7 @@ public UpdateView(){
   listPanel.add(Box.createRigidArea(new Dimension(1,20)));
   pick.setMaximumSize(pick.getPreferredSize());
   pick.setAlignmentX(CENTER_ALIGNMENT);
-  pick.addActionListener(a);
+  //pick.addActionListener(a);
   listPanel.add(pick);
   listPanel.setBackground(custom);
   add(listPanel);
@@ -80,7 +88,9 @@ public UpdateView(){
   emailPanel.add(changeEmail);
   emailPanel.add(Box.createRigidArea(new Dimension(20,1)));
   changeEmailText.setMaximumSize(changeEmailText.getPreferredSize());
-  changeEmailText.addActionListener(a);
+  changeEmailText.addActionListener(searchListener);
+  changeEmailText.setInputVerifier(ver);
+  changeEmailText.setName("email");
   emailPanel.add(changeEmailText);
   displayPanel.add(emailPanel);
 
@@ -91,18 +101,40 @@ public UpdateView(){
   rolesPanel.setBackground(custom);
   player.setBackground(custom); coach.setBackground(custom);
   parent.setBackground(custom);
-  player.addActionListener(a); coach.addActionListener(a);
-  parent.addActionListener(a);
+  player.addActionListener(searchListener); coach.addActionListener(searchListener);
+  parent.addActionListener(searchListener);
   changeRoles.setAlignmentY(CENTER_ALIGNMENT);
   rolesPanel.add(changeRoles);
   rolesPanel.add(player); rolesPanel.add(coach);
   rolesPanel.add(parent);
   displayPanel.add(rolesPanel);
+  displayPanel.add(Box.createRigidArea(new Dimension(1,20)));
 
+  JPanel statusPanel = new JPanel();
+  statusPanel.setBackground(custom);
+  statusPanel.setLayout(new BoxLayout(statusPanel,BoxLayout.X_AXIS));
+  statusLabel.setAlignmentY(CENTER_ALIGNMENT);
+  statusPanel.add(statusLabel);
+  statusPanel.add(Box.createRigidArea(new Dimension(20,1)));
+  status.add(active); status.add(inactive);
+  active.setBackground(custom); inactive.setBackground(custom);
+  statusPanel.add(active); statusPanel.add(inactive);
+  displayPanel.add(statusPanel);
+
+  displayPanel.add(Box.createRigidArea(new Dimension(1,20)));
+  JPanel editMemberPanel = new JPanel();
+  editMemberPanel.setLayout(new BoxLayout(editMemberPanel,BoxLayout.X_AXIS));
+  editMemberPanel.setBackground(custom);
   updateMember.setMaximumSize(updateMember.getPreferredSize());
   updateMember.setAlignmentX(CENTER_ALIGNMENT);
-  updateMember.addActionListener(a);
-  displayPanel.add(updateMember);
+  updateMember.addActionListener(updateListener);
+  editMemberPanel.add(updateMember);
+  editMemberPanel.add(Box.createRigidArea(new Dimension(10,1)));
+  deleteMember.setMaximumSize(deleteMember.getPreferredSize());
+  deleteMember.setAlignmentX(CENTER_ALIGNMENT);
+  deleteMember.addActionListener(updateListener);
+  editMemberPanel.add(deleteMember);
+  displayPanel.add(editMemberPanel);
   add(displayPanel);
 
 
@@ -131,19 +163,19 @@ public void updatedRoles(){
     
     
       if(player.isSelected()){
-         model.updateRole(0,model.getId());        
+         model.createRole(0,model.getId());        
       }
       else{
          model.deleteRole(0,model.getId());
       }
       if(coach.isSelected()){
-        model.updateRole(1,model.getId());
+        model.createRole(1,model.getId());
       }
       else{
         model.deleteRole(1,model.getId());
       }
       if(parent.isSelected()){
-        model.updateRole(2,model.getId());
+        model.createRole(2,model.getId());
       }
       else{
         model.deleteRole(2,model.getId());
@@ -159,23 +191,33 @@ public void clearSelection(){
  model.setId("");
 }
 
-ActionListener a = new ActionListener(){
+ActionListener searchListener = new ActionListener(){
   public void actionPerformed(ActionEvent e){
-      if(e.getSource()==searchButton){
+      if(e.getSource()==searchButton || e.getSource()==searchText){
         String id = searchText.getText();
         model.setId(id); // sets the models ID to be used in further methods
         setList(model.initList("SELECT * FROM medlem WHERE id="+model.getId()));
         
         changeEmailText.setText(model.getEmail(model.getId()));
         setRoles(model.getRoles(model.getId()));
-
+        
 
       }
+    }
+  };
+  ActionListener updateListener = new ActionListener(){
+      public void actionPerformed(ActionEvent e){
       if(e.getSource()==updateMember){
         model.updateEmail(model.getId(),changeEmailText.getText());
         updatedRoles();
         clearSelection();
+        setList(model.initList("SELECT * FROM medlem"));
 
+      }
+      else if(e.getSource()==deleteMember){
+        model.deleteMember(model.getId());
+        clearSelection();
+        setList(model.initList("SELECT * FROM medlem"));        
       }
   }
 };

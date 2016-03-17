@@ -10,8 +10,7 @@ public class ListModel implements Model{
   Statement st = null;
   ResultSet res = null;
   
-   String [] col = {"Id","Given name","Family name","Email","Gender","Birthday","Member since"
-    ,"Active"};
+  
 
   private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
@@ -74,13 +73,35 @@ public class ListModel implements Model{
     return res;
   }
 
-  public String[] getColumnNames(){
-    return col;
+  
+  public JComboBox<String> initTeams(){
+    JComboBox<String> teams = new JComboBox<>();
+    try{
+      res = st.executeQuery("SELECT DISTINCT team FROM funktion");
+      while(res.next()){
+        String team = res.getString(1);
+        teams.addItem(team);
+      }
+      res.close();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+    return teams;
+  }
+  public int getTeamMemberCount(String team){
+    int count =0;
+    try{
+      res = st.executeQuery("SELECT COUNT(*) FROM funktion WHERE team='"+team+"'");
+      count = res.getInt(1);
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+    return count;
   }
     
-    
-    
-    
+       
 
   
   public int getColumns(ResultSet rs){
@@ -120,7 +141,8 @@ public class ListModel implements Model{
       String gender = res.getString(5);
       String birth = res.getString(6);
       String memberSince = res.getString(7);
-      int active = res.getInt(8);
+      int tmp = res.getInt(8);
+      String status = convertActive(tmp);
 
       data[index][0]=id;
       data[index][1]=givenName;
@@ -129,7 +151,7 @@ public class ListModel implements Model{
       data[index][4]=gender;
       data[index][5]=birth;
       data[index][6]=memberSince;
-      data[index][7]=active;
+      data[index][7]=status;
 
       index++;
 
@@ -141,6 +163,16 @@ public class ListModel implements Model{
 
     return data;
   }
+  public String convertActive(int tmp){
+    String status="";
+    if(tmp==0){
+      status="Inactive";
+    }
+    else if(tmp==1){
+      status="Active";
+    }
+    return status;
+  }
   public Object[][] getTeamData(ResultSet res){
     Object[][] data = new Object[200][getColumns(res)];
 
@@ -150,7 +182,8 @@ public class ListModel implements Model{
         int id = res.getInt(1);
         String givenName = res.getString(2);
         String familyName = res.getString(3);
-        int role = res.getInt(4);
+        int tmp = res.getInt(4);
+        String role = convertRole(tmp);
         String team = res.getString(5);
 
         data[index][0]=id;
@@ -167,6 +200,19 @@ public class ListModel implements Model{
       JOptionPane.showMessageDialog(null,e.getMessage());
     }
     return data;
+  }
+  public String convertRole(int tmp){
+     String role = "";
+        if(tmp==0){
+          role="Player";
+        }
+        else if(tmp==1){
+          role="Coach";
+        }
+        else if(tmp==2){
+          role="Parent";
+        }
+        return role;
   }
 
   public boolean isNumeric(String s){

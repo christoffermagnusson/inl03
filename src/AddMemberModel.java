@@ -1,8 +1,11 @@
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import javax.swing.*;
 import java.text.*;
+
 
 public class AddMemberModel{
 
@@ -45,6 +48,27 @@ private int id;
       JOptionPane.showMessageDialog(null,e.getMessage());
     }
   }
+public DefaultListModel<String> initList(){
+  DefaultListModel<String> list = new DefaultListModel<String>();
+  try{
+    res = s.executeQuery("SELECT * FROM medlem");
+    while(res.next()){
+      String id = res.getString(1);
+      String givenName = res.getString(2);
+      String familyName = res.getString(3);
+      String email = res.getString(4);
+      
+      list.addElement(String.format("%s; %s; %s; %s;",id,givenName,familyName,email));
+
+    }
+    res.close();
+  }
+  catch(SQLException e){
+    JOptionPane.showMessageDialog(null,e.getMessage());
+  }
+  return list;
+}
+
   public ArrayList<String> initTeams(){
        ArrayList<String> teams = new ArrayList<String>();
        try{
@@ -58,12 +82,13 @@ private int id;
        }
        return teams;
   }
+
   
   public int setId(){
     // Kolla en tillgänglig array efter ID:n annars.
     int tmp =0;
     try{
-      res = s.executeQuery("SELECT COUNT(*) FROM medlem");
+      res = s.executeQuery("SELECT MAX(id) FROM medlem");
       tmp = res.getInt(1)+1;
     }
     catch(SQLException e){
@@ -72,7 +97,7 @@ private int id;
     return tmp;
   }
 
-  public String getDates(){
+  public String setMemberSince(){
     DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT);
     String now = df.format(new Date()); 
     return now;
@@ -109,6 +134,7 @@ private int id;
 
   }
   public void setRoles(int id,int role,String team){
+    
     try{
       
       PreparedStatement prepRoles = c.prepareStatement("INSERT INTO funktion VALUES(?,?,?)");
@@ -117,6 +143,17 @@ private int id;
       prepRoles.setString(3,team);
       prepRoles.executeUpdate();
     
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+  }
+  public void updateChildren(String childId,String parentId){
+    try{
+      PreparedStatement prepChildren = c.prepareStatement("INSERT INTO children VALUES(?,?)");
+      prepChildren.setString(1,parentId);
+      prepChildren.setString(2,childId);
+      prepChildren.executeUpdate();
     }
     catch(SQLException e){
       JOptionPane.showMessageDialog(null,e.getMessage());
