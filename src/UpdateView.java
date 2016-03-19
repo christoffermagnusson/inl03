@@ -159,6 +159,25 @@ public void setRoles(ArrayList<Integer> array){
     }
   }
 }
+public void setStatus(int status){
+  if(status==0){
+    inactive.setSelected(true);
+  }
+  else if(status==1){
+    active.setSelected(true);
+  }
+}
+public int sendUpdatedStatus(){
+  
+  if(inactive.isSelected()){
+    return 0;
+  }
+  else if(active.isSelected()){
+    return 1;
+  }
+  return 9;
+}
+
 public void updatedRoles(){
     
     
@@ -186,6 +205,7 @@ public void clearSelection(){
  player.setSelected(false);
  coach.setSelected(false);
  parent.setSelected(false);
+ status.clearSelection();
  changeEmailText.setText("");
  searchText.setText("");
  model.setId("");
@@ -200,6 +220,7 @@ ActionListener searchListener = new ActionListener(){
         
         changeEmailText.setText(model.getEmail(model.getId()));
         setRoles(model.getRoles(model.getId()));
+        setStatus(model.getStatus(model.getId()));
         
 
       }
@@ -210,6 +231,7 @@ ActionListener searchListener = new ActionListener(){
       if(e.getSource()==updateMember){
         model.updateEmail(model.getId(),changeEmailText.getText());
         updatedRoles();
+        model.updateStatus(sendUpdatedStatus(),model.getId());
         clearSelection();
         setList(model.initList("SELECT * FROM medlem"));
 

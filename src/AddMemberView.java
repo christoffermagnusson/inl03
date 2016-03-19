@@ -76,6 +76,7 @@ public class AddMemberView extends JPanel{
         childrenList = new JList<String>();
         setList(model.initList());
         childrenList.setEnabled(false);
+        childrenList.setMaximumSize(childrenList.getPreferredSize());
         listPane = new JScrollPane(childrenList,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         listPane.setVisible(true);
@@ -231,7 +232,6 @@ public class AddMemberView extends JPanel{
         rolePanel.setAlignmentX(CENTER_ALIGNMENT);
         player.setBackground(background); coach.setBackground(background); parent.setBackground(background);
         player.addActionListener(addMemberListener); coach.addActionListener(addMemberListener); 
-        //parent.addActionListener(addMemberListener);
         parent.addItemListener(parentListener);
         rolePanel.add(Box.createRigidArea(new Dimension(75,1)));
         rolePanel.add(roleLabel);
@@ -402,7 +402,7 @@ public class AddMemberView extends JPanel{
         amountOfChildren.setSelectedIndex(0);
         selectedChildrenId.clear();
         selectedChildrens.clear();
-        //töm children och childrenid array
+        
     }
 
 
@@ -464,7 +464,7 @@ public class AddMemberView extends JPanel{
 ActionListener addChildrenListener = new ActionListener(){
     public void actionPerformed(ActionEvent e){
         
-          //selectedChildren
+          
         
         if(e.getSource()==childrenButton){
             if(childrenIndex<(amountOfChildren.getSelectedIndex()+1)){

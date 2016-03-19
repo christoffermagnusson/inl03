@@ -2,7 +2,13 @@ import java.sql.*;
 import java.util.*;
 import javax.swing.*;
 
-
+/**
+*Class represents data handled in the update section of the program. Connection and statement
+*to database is established here
+*
+*@author  Christoffer Magnusson, William Lidholm
+*@version 1.0
+*/
 public class UpdateModel{
 
   Connection c = null;
@@ -78,6 +84,20 @@ public class UpdateModel{
 
     return email;
   }
+  public int getStatus(String id){
+    int status = 3;
+    try{
+      res = s.executeQuery("SELECT active FROM medlem WHERE id="+id);
+      while(res.next()){
+        status = res.getInt(1);
+      }
+      res.close();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+    return status;
+  }
 
    public void updateEmail(String id,String email){
     try{
@@ -88,6 +108,18 @@ public class UpdateModel{
     }
     catch(SQLException e){
       JOptionPane.showMessageDialog(null,"Member does not exist");
+    }
+  }
+
+  public void updateStatus(int status,String id){
+    try{
+      PreparedStatement prepStatus = c.prepareStatement("UPDATE medlem SET active=? WHERE id=?");
+      prepStatus.setInt(1,status);
+      prepStatus.setString(2,id);
+      prepStatus.executeUpdate();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
     }
   }
 
@@ -158,6 +190,8 @@ public class UpdateModel{
       PreparedStatement deleteFromParent = c.prepareStatement("DELETE FROM children WHERE pid=?");
       deleteFromParent.setString(1,id);
       deleteFromParent.executeUpdate();
+
+      //c.commit();
 
     }
     catch(SQLException e){

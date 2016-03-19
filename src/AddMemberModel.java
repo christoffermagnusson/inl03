@@ -76,6 +76,7 @@ public DefaultListModel<String> initList(){
         while(res.next()){
           teams.add(res.getString(1));
         }
+        res.close();
        }
        catch(SQLException e){
         JOptionPane.showMessageDialog(null,e.getMessage());
@@ -90,6 +91,7 @@ public DefaultListModel<String> initList(){
     try{
       res = s.executeQuery("SELECT MAX(id) FROM medlem");
       tmp = res.getInt(1)+1;
+      res.close();
     }
     catch(SQLException e){
       JOptionPane.showMessageDialog(null,e.getMessage());

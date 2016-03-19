@@ -44,10 +44,24 @@ public class ListView extends View{
 	JTextField searchText = new JTextField(15);
 	JButton search = new JButton("Search");
     
-    JPanel teamInfo = new JPanel();
-    JLabel teamLabel = new JLabel();
-    JLabel teamMemberCount = new JLabel();
+    JPanel teamPanel = new JPanel();
+    JLabel teamLabel1 = new JLabel();
+    JLabel teamLabel2 = new JLabel();
+    JButton moreInfoButton = new JButton("More info");
     
+    JFrame moreInfoFrame = new JFrame();
+    
+    JPanel infoPanelLeft = new JPanel();
+    JLabel infoLabel1 = new JLabel();
+    JLabel infoLabel2 = new JLabel();
+    JLabel infoLabel3 = new JLabel();
+    
+    JPanel infoPanelRight = new JPanel();
+    JLabel infoLabel4 = new JLabel();
+    ArrayList<String> children = new ArrayList<String>();
+    DefaultListModel<String> infoListModel = new DefaultListModel<>();
+
+    JList<String> childrenList = new JList<String>();
 
      
 
@@ -66,7 +80,7 @@ public class ListView extends View{
         con.ipadx = 50;
         con.gridy = 0; con.gridx = 0;
         con.weighty = 1; con.weightx = 0;
-        con.fill = GridBagConstraints.VERTICAL;
+        con.fill = GridBagConstraints.BOTH;
         con.gridheight = 10; con.gridwidth = 2;
         gbl.setConstraints(tools,con);
 
@@ -86,19 +100,52 @@ public class ListView extends View{
         tools.add(search);
         tools.add(Box.createRigidArea(new Dimension(1,30)));
 
-        teamInfo.setLayout(new BoxLayout(teamInfo,BoxLayout.Y_AXIS));
-        teamInfo.setBackground(backgrounds);
-        teamLabel.setAlignmentX(CENTER_ALIGNMENT);
-        teamInfo.add(teamLabel);
-        teamInfo.add(Box.createRigidArea(new Dimension(1,10)));
-        teamMemberCount.setAlignmentX(CENTER_ALIGNMENT);
-        teamInfo.add(teamMemberCount);
-        teamInfo.setVisible(false);
-        tools.add(teamInfo);
+        
 
+        teamPanel.setLayout(new BoxLayout(teamPanel,BoxLayout.Y_AXIS));
+        teamPanel.setBackground(backgrounds);
+        teamPanel.add(teamLabel1);
+        teamLabel1.setAlignmentX(CENTER_ALIGNMENT);
+        teamPanel.add(Box.createRigidArea(new Dimension(1,10)));
+        teamPanel.add(teamLabel2);
+        teamLabel2.setAlignmentX(CENTER_ALIGNMENT);
+        teamPanel.setVisible(true);
+        
+        tools.add(teamPanel);
+        tools.add(Box.createRigidArea(new Dimension(1,20)));
+        moreInfoButton.addActionListener(moreInfoListener);
+        moreInfoButton.setAlignmentX(CENTER_ALIGNMENT);
+        moreInfoButton.setEnabled(true);
+        tools.add(moreInfoButton);
+        
+        moreInfoFrame.setLayout(new GridLayout(1,2));
+        moreInfoFrame.setVisible(false);
+        moreInfoFrame.setSize(new Dimension(800,600));
+        moreInfoFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        
+        infoPanelLeft.setBackground(backgrounds);
+        infoPanelLeft.setLayout(new BoxLayout(infoPanelLeft,BoxLayout.Y_AXIS));
+        infoPanelLeft.add(infoLabel1);
+        infoPanelLeft.add(Box.createRigidArea(new Dimension(1,10)));
+        infoPanelLeft.add(infoLabel2);
+        infoPanelLeft.add(Box.createRigidArea(new Dimension(1,10)));
+        infoPanelLeft.add(infoLabel3);
+
+        infoPanelRight.setBackground(backgrounds);
+        infoPanelRight.setLayout(new BoxLayout(infoPanelRight,BoxLayout.Y_AXIS));
+        infoPanelRight.add(infoLabel4);
+        infoPanelRight.add(Box.createRigidArea(new Dimension(1,10)));
+        childrenList.setModel(infoListModel);
+        JScrollPane childrenListPane = new JScrollPane(childrenList,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        infoPanelRight.add(childrenListPane);
+
+        moreInfoFrame.add(infoPanelLeft);
+        moreInfoFrame.add(infoPanelRight);
 
         tools.setBorder(new LineBorder(Color.gray,1));
         tools.setBackground(backgrounds);
+        
 
 
 
@@ -185,6 +232,22 @@ else if(col==teamColumns){
     filterButton.setEnabled(true);
 }
   }
+  public void displayInfo(String id){
+    moreInfoFrame.setVisible(true);
+    String givenName = model.getElement("SELECT givenName FROM medlem WHERE id="+id);
+    String familyName = model.getElement("SELECT familyName FROM medlem WHERE id="+id);
+    String team = model.getElement("SELECT team FROM funktion WHERE id="+id);
+    infoLabel1.setText("First name : " + givenName);
+    infoLabel2.setText("Last name : " + familyName);
+    infoLabel3.setText("Team : " + team);
+    infoLabel4.setText("Parent to");
+    children = model.getChildren("SELECT cid FROM medlem,children WHERE id=pid AND id="+id);
+    for(String child : children){
+        infoListModel.addElement(child);
+        childrenList.setModel(infoListModel);
+        childrenList.setVisible(true);
+    }
+  }
  
 
 
@@ -192,12 +255,16 @@ else if(col==teamColumns){
   ActionListener searchListener = new ActionListener(){
     public void actionPerformed(ActionEvent e){
         if(e.getSource()==search){
-            teamInfo.setVisible(false);
+            
             if(model.isNumeric(searchText.getText())==false){
             updateTable("SELECT * FROM medlem WHERE givenName = '"+searchText.getText()+"'",memberColumns);
+
         }
         else{
             updateTable("SELECT * FROM medlem WHERE id = "+searchText.getText(),memberColumns);
+            children.clear();
+            infoListModel.removeAllElements();
+            
         }
     }
 }
@@ -206,7 +273,7 @@ else if(col==teamColumns){
 ActionListener sortListener = new ActionListener(){
     public void actionPerformed(ActionEvent e){
     if(e.getSource()==sortButton && switchTable.getSelectedItem().toString()=="View members"){
-        teamInfo.setVisible(false);
+        
         filterTeams.setEnabled(false);
         if(combox.getSelectedItem().toString()=="ID"){
             updateTable("SELECT * FROM medlem ORDER BY id",memberColumns);
@@ -217,7 +284,7 @@ ActionListener sortListener = new ActionListener(){
     }
 
  if(e.getSource()==sortButton && switchTable.getSelectedItem().toString()=="View teams"){
-    teamInfo.setVisible(false);
+    
     if(combox.getSelectedItem().toString()=="ID"){
         updateTable("SELECT DISTINCT medlem.id,givenName,familyName,role,team FROM medlem,funktion ON medlem.id=funktion.id WHERE team IS NOT NULL ORDER BY medlem.id"
             ,teamColumns);
@@ -239,6 +306,8 @@ ActionListener sortListener = new ActionListener(){
         else if(switchTable.getSelectedItem().toString()=="View members"){
             updateTable("SELECT * FROM medlem",memberColumns);
             filterTeams.setEnabled(false);
+            teamLabel1.setText("");
+            teamLabel2.setText("");
         }
     }
 }
@@ -250,11 +319,29 @@ ActionListener sortListener = new ActionListener(){
             updateTable("SELECT DISTINCT medlem.id,givenName,familyName,role,team FROM medlem,funktion ON medlem.id=funktion.id WHERE team='"
                 +filterTeams.getSelectedItem()+"' ORDER BY role DESC",teamColumns);
             String teamName = filterTeams.getSelectedItem().toString();
-            teamInfo.setVisible(true);
-            teamLabel.setText("Team: "+teamName);
+            
+            teamLabel1.setText("Team: "+teamName);
             int memberCount = model.getTeamMemberCount(teamName);
-            teamMemberCount.setText("Nr of members: "+memberCount);
+            teamLabel2.setText("Nr of members: "+memberCount);
            }
+        }
+    };
+
+    ActionListener moreInfoListener = new ActionListener(){
+        public void actionPerformed(ActionEvent e){
+            if(e.getSource()==moreInfoButton){
+                children.clear();
+            infoListModel.removeAllElements();    
+                if(model.isNumeric(searchText.getText())==true){
+
+                displayInfo(searchText.getText());
+                }
+                else{
+                    int row = memberTable.getSelectedRow();
+                    String id = memberTable.getValueAt(row,0).toString();
+                    displayInfo(id);
+                }
+            }
         }
     };
   

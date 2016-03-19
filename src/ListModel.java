@@ -4,6 +4,14 @@ import javax.swing.*;
 import java.beans.*;
 import java.sql.Statement;
 
+/**
+*Class representing data to be used in the tab that is presenting the table of members. 
+*Database connection and statement established for functionality regarding the list tab is
+*located in this class. 
+*
+*@author  Christoffer Magnusson, William Lidholm
+*@version 1.0
+*/
 public class ListModel implements Model{
 
   Connection c = null;
@@ -109,10 +117,12 @@ public class ListModel implements Model{
     try{
       ResultSetMetaData meta = rs.getMetaData();
       columnCount = meta.getColumnCount();
+
     }
     catch(SQLException e){
 
     }
+
     return columnCount;
 
   }
@@ -223,6 +233,53 @@ public class ListModel implements Model{
     catch(NumberFormatException e){
       return false;
     }
+  }
+  public String getElement(String q){
+    String element = "";
+    
+    try{
+      res = st.executeQuery(q);
+      while(res.next()){
+        element = res.getString(1);
+        
+      }
+      
+      res.close();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+    return element;
+  }
+  public ArrayList<String> getChildren(String q){
+    ArrayList<String> childrenNames = new ArrayList<String>();
+    ArrayList<String> childrenId = new ArrayList<String>();
+    try{
+      res = st.executeQuery(q);
+      while(res.next()){
+        String tmp = res.getString(1);
+        childrenId.add(tmp);
+      }
+      res.close();
+    }
+    catch(SQLException e){
+      JOptionPane.showMessageDialog(null,e.getMessage());
+    }
+    try{
+      for(String s : childrenId){
+      res = st.executeQuery("SELECT DISTINCT givenName,familyName FROM medlem,children WHERE id=cid AND cid="+s);
+        while(res.next()){
+          String tmp = res.getString(1)+" "+res.getString(2);
+          childrenNames.add(tmp);
+
+        }
+    }
+    res.close();
+  }
+  catch(SQLException e){
+    JOptionPane.showMessageDialog(null,e.getMessage());
+  }
+  return childrenNames;
   }
   
   
